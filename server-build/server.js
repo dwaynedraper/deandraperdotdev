@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
+const path_1 = __importDefault(require("path"));
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const twilioServices_1 = require("./twilioServices");
@@ -23,9 +24,13 @@ const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
-const PORT = process.env.PORT || 3021;
+app.use(express_1.default.static(path_1.default.join(__dirname, "public")));
+const PORT = process.env.SERVER_PORT || 3021;
 // Routes
 // NOTE: Routes follow the error first callback pattern
+// app.get("/resume", (req, res) => {
+//   res.sendFile(path.join(__dirname + "/resume.pdf"));
+// });
 app.post("/create-random", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("app.post /create-random");
     yield (0, database_1.createRandom)(req.body, (err, data) => {
@@ -49,7 +54,7 @@ app.get("/get-example-message", (req, res) => {
     }
 });
 app.post("/send-sms", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { body } = req.body;
+    const body = JSON.stringify(req.body).split(",").join("\n");
     yield (0, twilioServices_1.sendSms)("+18322361481", body, (err, data) => {
         if (err) {
             res.status(500).send(err);
@@ -58,12 +63,7 @@ app.post("/send-sms", (req, res) => __awaiter(void 0, void 0, void 0, function* 
             res.status(201).send(data);
         }
     });
-    // try {
-    //   await sendSms("+18322361481", body);
-    //   res.send("Message sent");
-    // } catch (error) {
-    //   res.send("Error sending message" + error.message);
-    // }
+    res.status(201).send("ok");
 }));
 app.get("/get-random", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

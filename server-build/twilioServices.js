@@ -15,7 +15,7 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require("twilio")(accountSid, authToken);
 const sendSms = (to, body, callback) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("sendSms");
+    console.log("sendSms", to, body);
     const message = yield client.messages
         .create({
         body,

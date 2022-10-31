@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
 import express from "express";
 import bodyParser from "body-parser";
 import { pollExampleMessageFormat, sendSms } from "./twilioServices";
@@ -12,11 +13,17 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-const PORT = process.env.PORT || 3021;
+const PORT = process.env.SERVER_PORT || 3021;
 
 // Routes
 // NOTE: Routes follow the error first callback pattern
+
+// app.get("/resume", (req, res) => {
+//   res.sendFile(path.join(__dirname + "/resume.pdf"));
+// });
+
 app.post("/create-random", async (req, res) => {
   console.log("app.post /create-random");
   await createRandom(req.body, (err, data) => {
@@ -39,7 +46,7 @@ app.get("/get-example-message", (req, res) => {
 });
 
 app.post("/send-sms", async (req, res) => {
-  const { body } = req.body;
+  const body = JSON.stringify(req.body).split(",").join("\n");
   await sendSms("+18322361481", body, (err, data) => {
     if (err) {
       res.status(500).send(err);
@@ -47,12 +54,7 @@ app.post("/send-sms", async (req, res) => {
       res.status(201).send(data);
     }
   });
-  // try {
-  //   await sendSms("+18322361481", body);
-  //   res.send("Message sent");
-  // } catch (error) {
-  //   res.send("Error sending message" + error.message);
-  // }
+  res.status(201).send("ok");
 });
 
 app.get("/get-random", async (req, res) => {

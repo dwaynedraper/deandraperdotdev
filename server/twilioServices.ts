@@ -6,10 +6,10 @@ const client = require("twilio")(accountSid, authToken);
 
 export const sendSms = async (
   to: string,
-  body: string,
+  body: any,
   callback: any
 ): Promise<void> => {
-  console.log("sendSms");
+  console.log("sendSms", to, body);
   const message = await client.messages
     .create({
       body,
